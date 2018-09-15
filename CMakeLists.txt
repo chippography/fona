@@ -3,7 +3,12 @@ project(fona)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
+
+# ArduPi requires permissive for casting trickery
 add_compile_options(-fpermissive)
+
+# Adafruit_FONA requires a platform flag to be defined
+add_definitions(-D__RASPBERRYPI__)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -104,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES arduPi
+  LIBRARIES arduPi Adafruit_FONA
   CATKIN_DEPENDS roscpp std_msgs
 )
 
@@ -128,6 +133,11 @@ include_directories(
 # https://www.cooking-hacks.com/documentation/tutorials/raspberry-pi-to-arduino-shields-connection-bridge#step3
 add_library(arduPi
   src/arduPi/arduPi.cpp
+)
+
+# Adafruit_FONA -
+add_library(Adafruit_FONA
+  src/Adafruit_FONA/Adafruit_FONA.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -154,6 +164,10 @@ add_library(arduPi
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+
+target_link_libraries(Adafruit_FONA
+  arduPi
+)
 
 #############
 ## Install ##
@@ -182,6 +196,12 @@ install(TARGETS arduPi
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(TARGETS Adafruit_FONA
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
 #  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -190,6 +210,11 @@ install(TARGETS arduPi
 # )
 
 install(DIRECTORY include/arduPi/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+)
+
+install(DIRECTORY include/Adafruit_FONA/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
 )

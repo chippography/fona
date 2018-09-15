@@ -192,10 +192,16 @@ void SerialPi::println(const char *message){
 /* Prints data to the serial port as human-readable ASCII text followed
  * by a carriage retrun character '\r' and a newline character '\n' */
 void SerialPi::println(char message){
+  const char *newline="\r\n";
+  char * msg = NULL;
+  asprintf(&msg,"%c%s",message,newline);
+	  unistd::write(sd,msg,strlen(msg));
+}
+
+/* Prints a carriage retrun character '\r' and a newline character '\n' */
+void SerialPi::println(){
 	const char *newline="\r\n";
-	char * msg = NULL;
-	asprintf(&msg,"%s%s",&message,newline);
-    unistd::write(sd,msg,strlen(msg));
+  unistd::write(sd,newline,strlen(newline));
 }
 
 /* Prints data to the serial port as human-readable ASCII text followed
@@ -465,6 +471,81 @@ void SerialPi::setTimeout(long millis){
 void SerialPi::end(){
 	unistd::close(sd);
 }
+
+/*******************/
+
+
+//Prints data to the serial port as human-readable ASCII text.
+void debug_print(const char *message){
+	printf("%s", message);
+}
+
+//Prints data to the serial port as human-readable ASCII text.
+void debug_print(char message){
+	printf("%c", message);
+}
+
+/* Prints data to the serial port as human-readable ASCII text.
+ * precission is used to limit the number of decimals.
+ */
+void debug_print(float f, int precission){
+	/*
+    const char *str1="%.";
+    char * str2;
+    char * str3;
+    char * message;
+    sprintf(str2,"%df",precission);
+    asprintf(&str3,"%s%s",str1,str2);
+    sprintf(message,str3,f);
+	*/
+	printf("%.1f", f );
+}
+
+/* Prints data to the serial port as human-readable ASCII text followed
+ * by a carriage retrun character '\r' and a newline character '\n' */
+void debug_println(const char *message){
+	printf("%s\r\n",message);
+}
+
+/* Prints data to the serial port as human-readable ASCII text followed
+ * by a carriage retrun character '\r' and a newline character '\n' */
+void debug_println(char message){
+	printf("%c\r\n",message);
+}
+
+/* Prints a carriage retrun character '\r' and a newline character '\n' */
+void debug_println(){
+	printf("\r\n");
+}
+
+/* Prints data to the serial port as human-readable ASCII text followed
+ * by a carriage retrun character '\r' and a newline character '\n' */
+void debug_println(float f, int precission){
+    const char *str1="%.";
+    char * str2;
+    char * str3;
+    char * message;
+    sprintf(str2,"%df",precission);
+    asprintf(&str3,"%s%s",str1,str2);
+    sprintf(message,str3,f);
+
+    const char *newline="\r\n";
+    char * msg = NULL;
+    printf("%s%s",message,newline);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*******************
  * Private methods *
