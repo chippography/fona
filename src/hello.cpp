@@ -62,9 +62,65 @@ int main(int argc, char **argv)
    * The first NodeHandle constructed will fully initialize this node, and the last
    * NodeHandle destructed will close down the node.
    */
-// %Tag(NODEHANDLE)%
   ros::NodeHandle n;
-// %EndTag(NODEHANDLE)%
+
+  // Attempt to Connect to FONA
+  ROS_INFO("hello_fona");
+
+  // Use this for FONA 800 and 808s
+  Adafruit_FONA fona = Adafruit_FONA(4); // Reset Pin 4 is GPIO24 on RPI
+
+  // Create Hardware Serial Connection
+  Serial.begin(115200);
+    
+  // initiate FONA connection
+  if (! fona.begin(Serial)) {
+    ROS_INFO("Couldn't find FONA");
+  }
+
+  // identify FONA type
+  uint8_t fona_type = fona.type();
+  ROS_INFO("FONA is OK");
+  switch (fona_type) {
+    case FONA800L:
+      ROS_INFO("FONA 800L"); break;
+    case FONA800H:
+      ROS_INFO("FONA 800H"); break;
+    case FONA808_V1:
+      ROS_INFO("FONA 808 (v1)"); break;
+    case FONA808_V2:
+      ROS_INFO("FONA 808 (v2)"); break;
+    case FONA3G_A:
+      ROS_INFO("FONA 3G (American)"); break;
+    case FONA3G_E:
+      ROS_INFO("FONA 3G (European)"); break;
+    default:
+      ROS_INFO("???"); break;
+  }
+
+  // Print module IMEI number.
+  char imei[16] = {0}; // MUST use a 16 character buffer for IMEI!
+  uint8_t imeiLen = fona.getIMEI(imei);
+  if (imeiLen > 0) {
+    ROS_INFO("Module IMEI: %s", imei);
+  }
+
+  // Optionally configure a GPRS APN, username, and password.
+  // You might need to do this to access your network's GPRS/data
+  // network.  Contact your provider for the exact APN, username,
+  // and password values.  Username and password are optional and
+  // can be removed, but APN is required.
+  //fona.setGPRSNetworkSettings(F("your APN"), F("your username"), F("your password"));
+
+  // Optionally configure HTTP gets to follow redirects over SSL.
+  // Default is not to follow SSL redirects, however if you uncomment
+  // the following line then redirects over SSL will be followed.
+  //fona.setHTTPSRedirect(true);
+
+  ROS_INFO("FONA READY");
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Advertise ROS Subscriptions and Services
 
   /**
    * The advertise() function is how you tell ROS that you want to
@@ -83,49 +139,63 @@ int main(int argc, char **argv)
    * than we can send them, the number here specifies how many messages to
    * buffer up before throwing some away.
    */
-// %Tag(PUBLISHER)%
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("fona", 1000);
-// %EndTag(PUBLISHER)%
 
+  // Publications
+  // TODO: phone/status Messages
+  // - issue, polling call status... conflicts with other service, mutex?
 
-  // Attempt to Connect to FONA
-  ROS_INFO("hello_fona");
+  // Phone Services
+  // PhoneCall.srv
+  /*
+        // call a phone!
+        char number[30];
+        flushSerial();
+        Serial.print(F("Call #"));
+        readline(number, 30);
+        Serial.println();
+        Serial.print(F("Calling ")); Serial.println(number);
+        if (!fona.callPhone(number)) {
+          Serial.println(F("Failed"));
+        } else {
+          Serial.println(F("Sent!"));
+        }
+    */
 
-  // Use this for FONA 800 and 808s
-  Adafruit_FONA fona = Adafruit_FONA(4); // Reset Pin 4 is GPIO24 on RPI
+  // CallStatus.srv
+  /*
+        // get call status
+        int8_t callstat = fona.getCallStatus();
+        switch (callstat) {
+          case 0: Serial.println(F("Ready")); break;
+          case 1: Serial.println(F("Could not get status")); break;
+          case 3: Serial.println(F("Ringing (incoming)")); break;
+          case 4: Serial.println(F("Ringing/in progress (outgoing)")); break;
+          default: Serial.println(F("Unknown")); break;
+    */
 
-  // Create Hardware Serial Connection
-  Serial.begin(115200);
-    
-  // initiate FONA connection
-  if (! fona.begin(Serial)) {
-    ROS_INFO("Couldn't find FONA");
-  }
+  // HangUpPhone.srv
+  /*
+        // hang up!
+        if (! fona.hangUp()) {
+          Serial.println(F("Failed"));
+        } else {
+          Serial.println(F("OK!"));
+        }
+    */
 
-/*
-  type = fona.type();
-  Serial.println(F("FONA is OK"));
-  Serial.print(F("Found "));
-  switch (type) {
-    case FONA800L:
-      Serial.println(F("FONA 800L")); break;
-    case FONA800H:
-      Serial.println(F("FONA 800H")); break;
-    case FONA808_V1:
-      Serial.println(F("FONA 808 (v1)")); break;
-    case FONA808_V2:
-      Serial.println(F("FONA 808 (v2)")); break;
-    case FONA3G_A:
-      Serial.println(F("FONA 3G (American)")); break;
-    case FONA3G_E:
-      Serial.println(F("FONA 3G (European)")); break;
-    default: 
-      Serial.println(F("???")); break;
-  }
-*/
+  // PickUpPhone.srv
+  /*
+        // pick up!
+        if (! fona.pickUp()) {
+          Serial.println(F("Failed"));
+        } else {
+          Serial.println(F("OK!"));
+        }
+    */
 
 ///////////////////////
 // LOOPING CODE START
+// ros::Publisher chatter_pub = n.advertise<std_msgs::String>("fona", 1000);
 
 //  ros::Rate loop_rate(10);
 
