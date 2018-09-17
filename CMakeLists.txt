@@ -5,7 +5,7 @@ project(fona)
 # add_compile_options(-std=c++11)
 
 # ArduPi requires permissive for casting trickery
-add_compile_options(-fpermissive)
+add_compile_options(-fpermissive -ggdb)
 
 # Adafruit_FONA requires a platform flag to be defined
 add_definitions(-D__RASPBERRYPI__)
@@ -150,6 +150,9 @@ add_library(Adafruit_FONA
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/fona_node.cpp)
 
+# hello FONA source code
+add_executable(hello_fona src/hello.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -167,6 +170,13 @@ add_library(Adafruit_FONA
 
 target_link_libraries(Adafruit_FONA
   arduPi
+)
+
+# hello_fona libraries
+target_link_libraries(hello_fona 
+  ${catkin_LIBRARIES}
+  arduPi
+  Adafruit_FONA
 )
 
 #############

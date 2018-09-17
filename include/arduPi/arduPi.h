@@ -414,7 +414,7 @@ void debug_println();
 void debug_println(float f, int precission);
 
 extern SerialPi Serial;
-extern WirePi Wire;
-extern SPIPi SPI;
+// extern WirePi Wire;
+// extern SPIPi SPI;
 
 #endif

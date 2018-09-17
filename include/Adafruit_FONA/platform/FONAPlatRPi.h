@@ -33,7 +33,9 @@
 // need to do some debugging...
 #define DEBUG_PRINT(...) debug_print(__VA_ARGS__)
 #define DEBUG_PRINTLN(...) debug_println(__VA_ARGS__)
+
 #endif
+
 
 // a few typedefs to keep things portable
 typedef	SerialPi FONAStreamType;

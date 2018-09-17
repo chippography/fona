@@ -60,7 +60,8 @@ timeval start_program, end_point;
 //Constructor
 SerialPi::SerialPi(){
 	REV = getBoardRev();
-    serialPort="/dev/ttyAMA0";
+    // serialPort="/dev/ttyAMA0";
+    serialPort="/dev/serial0";    
     timeOut = 1000;
 }
 
@@ -1377,6 +1378,7 @@ int digitalRead(int pin){
 	return value;
 }
 
+/*
 int analogRead (int pin){
 
 	int value;
@@ -1410,6 +1412,7 @@ int analogRead (int pin){
 	value = value * 1023 / 4095;  //mapping the value between 0 and 1023
 	return value;
 }
+*/
 
 void attachInterrupt(int p,void (*f)(), Digivalue m){
 	int GPIOPin = raspberryPinNumber(p);
@@ -1645,5 +1648,5 @@ void * threadFunction(void *args){
 }
 
 SerialPi Serial = SerialPi();
-WirePi Wire = WirePi();
-SPIPi SPI = SPIPi();
+// WirePi Wire = WirePi();
+// SPIPi SPI = SPIPi();
