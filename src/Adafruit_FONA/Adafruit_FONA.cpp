@@ -28,7 +28,6 @@
   using namespace std;
 #endif
 
-
 Adafruit_FONA::Adafruit_FONA(int8_t rst)
 {
   _rstpin = rst;
@@ -47,14 +46,23 @@ uint8_t Adafruit_FONA::type(void) {
 }
 
 boolean Adafruit_FONA::begin(FONAStreamType &port) {
+  DEBUG_PRINTLN("Adafruit_FONA::begin");
   mySerial = &port;
+  DEBUG_PRINTLN("A");
 
-  pinMode(_rstpin, OUTPUT);
+/*
+  // Remove PIN RESET
+  DEBUG_PRINTLN("pinMode(_rstpin, OUTPUT);");
+  pinMode(_rstpin, OUTPUT); // SEGFAULT
+  DEBUG_PRINTLN("digitalWrite(_rstpin, HIGH);");
   digitalWrite(_rstpin, HIGH);
+  DEBUG_PRINTLN("delay(10);");
   delay(10);
   digitalWrite(_rstpin, LOW);
   delay(100);
   digitalWrite(_rstpin, HIGH);
+*/  
+  DEBUG_PRINTLN("B");
 
   DEBUG_PRINTLN(F("Attempting to open comm with ATs"));
   // give 7 seconds to reboot
@@ -70,6 +78,7 @@ boolean Adafruit_FONA::begin(FONAStreamType &port) {
     delay(500);
     timeout-=500;
   }
+  DEBUG_PRINTLN("C");
 
   if (timeout <= 0) {
 #ifdef ADAFRUIT_FONA_DEBUG
@@ -82,26 +91,33 @@ boolean Adafruit_FONA::begin(FONAStreamType &port) {
     sendCheckReply(F("AT"), ok_reply);
     delay(100);
   }
+  DEBUG_PRINTLN("D");
 
   // turn off Echo!
   sendCheckReply(F("ATE0"), ok_reply);
   delay(100);
+  DEBUG_PRINTLN("E");
 
   if (! sendCheckReply(F("ATE0"), ok_reply)) {
     return false;
   }
+  DEBUG_PRINTLN("F");
 
   // turn on hangupitude
   sendCheckReply(F("AT+CVHU=0"), ok_reply);
+  DEBUG_PRINTLN("G");
 
   delay(100);
   flushInput();
+  DEBUG_PRINTLN("H");
 
 
   DEBUG_PRINT(F("\t---> ")); DEBUG_PRINTLN("ATI");
 
   mySerial->println("ATI");
+  DEBUG_PRINTLN("I");
   readline(500, true);
+  DEBUG_PRINTLN("J");
 
   DEBUG_PRINT (F("\t<--- ")); DEBUG_PRINTLN(replybuffer);
 
@@ -118,14 +134,18 @@ boolean Adafruit_FONA::begin(FONAStreamType &port) {
   } else if (prog_char_strstr(replybuffer, (prog_char *)F("SIMCOM_SIM5320E")) != 0) {
     _type = FONA3G_E;
   }
+  DEBUG_PRINTLN("K");
 
   if (_type == FONA800L) {
     // determine if L or H
+  DEBUG_PRINTLN("L");
 
   DEBUG_PRINT(F("\t---> ")); DEBUG_PRINTLN("AT+GMM");
 
     mySerial->println("AT+GMM");
+  DEBUG_PRINTLN("N");
     readline(500, true);
+  DEBUG_PRINTLN("O");
 
   DEBUG_PRINT (F("\t<--- ")); DEBUG_PRINTLN(replybuffer);
 
@@ -133,11 +153,14 @@ boolean Adafruit_FONA::begin(FONAStreamType &port) {
     if (prog_char_strstr(replybuffer, (prog_char *)F("SIM800H")) != 0) {
       _type = FONA800H;
     }
+    DEBUG_PRINTLN("P");
+
   }
 
 #if defined(FONA_PREF_SMS_STORAGE)
     sendCheckReply(F("AT+CPMS=" FONA_PREF_SMS_STORAGE "," FONA_PREF_SMS_STORAGE "," FONA_PREF_SMS_STORAGE), ok_reply);
 #endif
+  DEBUG_PRINTLN("Q");
 
   return true;
 }

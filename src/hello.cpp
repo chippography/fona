@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   Adafruit_FONA fona = Adafruit_FONA(4); // Reset Pin 4 is GPIO24 on RPI
 
   // Create Hardware Serial Connection
-  Serial.begin(4800);
+  Serial.begin(115200);
     
   // initiate FONA connection
   if (! fona.begin(Serial)) {
@@ -163,6 +163,7 @@ int main(int argc, char **argv)
 ///////////////////////////
 
   // spin forever
+  ROS_INFO("ROS Spin");
   ros::spin();
 
   return 0;
